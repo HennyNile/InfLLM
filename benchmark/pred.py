@@ -1,5 +1,7 @@
 # https://github.com/THUDM/LongBench/blob/main/pred.py
 import os
+import sys
+sys.path.append('.')
 from datasets import load_from_disk
 import torch
 import json
@@ -304,6 +306,8 @@ if __name__ == '__main__':
     # predict on each dataset
     for dataset in datasets:
         dname = dataset
+        with open('qilong_time_statistic', 'a+') as f:
+            f.write(f'dataset: {dname}\n') 
         if dataset in set([
             "kv_retrieval", "passkey", "number_string", "code_run", "code_debug", "longdialogue_qa_eng", "longbook_qa_eng", "longbook_sum_eng", "longbook_choice_eng", "longbook_qa_chn", "math_find", "math_calc"
         ]):

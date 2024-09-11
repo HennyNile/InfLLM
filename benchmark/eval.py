@@ -1,5 +1,7 @@
 # https://github.com/THUDM/LongBench/blob/main/eval.py
 import os
+import sys
+sys.path.append('.')
 import json
 import argparse
 import numpy as np

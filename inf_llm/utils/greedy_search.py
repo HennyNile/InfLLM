@@ -1,4 +1,5 @@
 import torch
+import time
 
 class GreedySearch:
     def __init__(self, model, tokenizer):
@@ -45,10 +46,13 @@ class GreedySearch:
         if output:
             output_text = ""
         
+        time_statistic = open('qilong_time_statistic', 'a+')
+        infer_st = time.time()
         for i in range(max_length + 1):
             if i == 0:
                 if chunk_size is None:
                     chunk_size = input_ids.size(1)
+                prefill_st = time.time()
                 for st in range(0, input_ids.size(1) - 1, chunk_size):
                     ed = min(input_ids.size(1) - 1, st + chunk_size)
                     out = self.model(
@@ -59,6 +63,8 @@ class GreedySearch:
                         past_key_values = past_key_values
                     )
                     logits, past_key_values = out.logits, out.past_key_values
+                prefill_et = time.time()
+                time_statistic.write(f'prefilling time: {prefill_et-prefill_st}, input size: {input_ids.size(1) - 1}, ')
 
                 out = self.model(
                     input_ids = input_ids[:, -1:],
@@ -95,6 +101,9 @@ class GreedySearch:
                     sys.stdout.write(tmp[len(output_text):])
                     sys.stdout.flush()
                     output_text = tmp
+        infer_et = time.time()
+        time_statistic.write(f'inference time: {infer_et - infer_st}, output length: {i}\n')
+        time_statistic.close()
 
         self.past_kv = past_key_values
 
