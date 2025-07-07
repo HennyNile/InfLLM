@@ -198,7 +198,7 @@ def get_pred(
     max_gen, prompt_format, dataset, model_name, 
     gen_chunk_size = None, truncation: str = None, 
     rank: int = None, world_size: int = None,
-    verbose: bool = False
+    verbose: bool = False, output_path=None
 ):
     preds = []
     data = list(data)
@@ -275,7 +275,10 @@ def get_pred(
             print("Pred:", pred)
             print("Answer:", json_obj["answers"])
             print("")
-
+            
+        with open(out_path, "a+", encoding="utf-8") as f:
+            json.dump({"pred": pred, "answers": json_obj["answers"], "all_classes": json_obj["all_classes"], "length": json_obj["length"], "token_length": len(tokenized_prompt) + max_gen}, f, ensure_ascii=False)
+            f.write('\n')
 
     return preds
 
@@ -311,14 +314,23 @@ if __name__ == '__main__':
             data = load_infinite_bench(path, dname)
 
         else:
-            data = load_from_disk(
-                f"benchmark/data/longbench/{dataset}"
-            )
+            # data = load_from_disk(
+            #     f"benchmark/data/longbench/{dataset}"
+            # )
+            print(dataset)
+            path = "benchmark/data/longbench"
+            fin = open(os.path.join(path, dname + ".jsonl"), "r")
+            lines = fin.readlines()
+            fin.close()
+            data = [json.loads(line) for line in lines]
+
 
         out_path = os.path.join(
             output_dir_path,
             f"{dname}.jsonl"
         )
+        if multiprocessing:
+            out_path = out_path + f"_{args.rank}"
 
         print(f"Pred {dname}")
         prompt_format = dataset2prompt[dataset]
@@ -331,11 +343,11 @@ if __name__ == '__main__':
             args.conv_type, 
             args.chunk_size, args.truncation,
             args.rank, args.world_size,
-            args.verbose
+            args.verbose,
+            out_path
         )
-        if multiprocessing:
-            out_path = out_path + f"_{args.rank}"
-        with open(out_path, "w+", encoding="utf-8") as f:
-            for pred in preds:
-                json.dump(pred, f, ensure_ascii=False)
-                f.write('\n')
+        
+        # with open(out_path, "w+", encoding="utf-8") as f:
+        #     for pred in preds:
+        #         json.dump(pred, f, ensure_ascii=False)
+        #         f.write('\n')

@@ -17,7 +17,7 @@ def huggingface_forward(forward):
             self, hidden_states, hidden_states,
             position_ids, use_cache, past_key_value,
             self.q_proj, self.k_proj, self.v_proj, self.o_proj, 
-            self.head_dim, self.num_heads, self.num_key_value_heads
+            self.head_dim, self.config.num_attention_heads, self.config.num_key_value_heads
         )
         if use_cache:
             o, pkv = ret
@@ -149,11 +149,11 @@ def patch_hf(
     else:
         raise ValueError("Only supports llama, mistral and qwen2 models.")
 
-    hf_rope = model.model.layers[0].self_attn.rotary_emb 
-    base = base if base is not None else hf_rope.base
+    # hf_rope = model.model.layers[0].self_attn.rotary_emb 
+    # base = base if base is not None else hf_rope.base
     distance_scale = distance_scale if distance_scale is not None else 1.0
     rope = RotaryEmbeddingESM(
-        hf_rope.dim,
+        128, # hf_rope.dim,
         base,
         distance_scale
     )

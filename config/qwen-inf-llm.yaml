@@ -1,6 +1,6 @@
 model:
   type: inf-llm
-  path: Qwen/Qwen1.5-7B-Chat
+  path: Qwen/Qwen2.5-7B-Instruct
   block_size: 128
   n_init: 128
   n_local: 4096
@@ -8,7 +8,7 @@ model:
   repr_topk: 4
   max_cached_block: 32
   exc_block_size: 512
-  fattn: false
+  fattn: true
   base: 1000000
   distance_scale: 1.0
 

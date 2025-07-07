@@ -1,4 +1,4 @@
-config=config/mistral-inf-llm.yaml
+config=config/qwen-inf-llm.yaml
 
 datasets="narrativeqa,qasper,multifieldqa_en,\
 hotpotqa,2wikimqa,musique,\
